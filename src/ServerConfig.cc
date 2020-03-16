@@ -532,7 +532,7 @@ std::list<ServerConfig::PluginInfo> Parse(tinyxml2::XMLDocument &_doc)
     std::string name = nameStr == nullptr ? "" : nameStr;
     if (name.empty())
     {
-      ignerr << "GazeboServer plugin is missing the name attribute. "
+      ignerr << "Plugin is missing the name attribute. "
         << "Skipping this plugin.\n";
       continue;
     }
@@ -542,7 +542,7 @@ std::list<ServerConfig::PluginInfo> Parse(tinyxml2::XMLDocument &_doc)
     std::string file = fileStr == nullptr ? "" : fileStr;
     if (file.empty())
     {
-      ignerr << "A GazeboServer plugin with name[" << name << "] is "
+      ignerr << "A Plugin with name[" << name << "] is "
         << "missing the filename attribute. Skipping this plugin.\n";
       continue;
     }
@@ -552,7 +552,7 @@ std::list<ServerConfig::PluginInfo> Parse(tinyxml2::XMLDocument &_doc)
     std::string entityName = entityNameStr == nullptr ? "" : entityNameStr;
     if (entityName.empty())
     {
-      ignerr << "A GazeboServer plugin with name[" << name << "] and "
+      ignerr << "A Plugin with name[" << name << "] and "
         << "filename[" << file << "] is missing the entity_name attribute. "
         << "Skipping this plugin.\n";
       continue;
@@ -563,7 +563,7 @@ std::list<ServerConfig::PluginInfo> Parse(tinyxml2::XMLDocument &_doc)
     std::string entityType = entityTypeStr == nullptr ? "" : entityTypeStr;
     if (entityType.empty())
     {
-      ignerr << "A GazeboServer plugin with name[" << name << "] and "
+      ignerr << "A Plugin with name[" << name << "] and "
         << "filename[" << file << "] is missing the entity_type attribute. "
         << "Skipping this plugin.\n";
       continue;
