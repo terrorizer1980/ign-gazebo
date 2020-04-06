@@ -57,6 +57,7 @@
 #include "ignition/gazebo/components/Scene.hh"
 #include "ignition/gazebo/components/Temperature.hh"
 #include "ignition/gazebo/components/ThermalCamera.hh"
+#include "ignition/gazebo/components/Transparency.hh"
 #include "ignition/gazebo/components/Visual.hh"
 #include "ignition/gazebo/components/World.hh"
 #include "ignition/gazebo/EntityComponentManager.hh"
@@ -537,6 +538,7 @@ void RenderUtilPrivate::CreateRenderingEntities(
     _ecm.Each<components::Visual, components::Name, components::Pose,
               components::Geometry,
               components::CastShadows,
+              components::Transparency,
               components::ParentEntity>(
         [&](const Entity &_entity,
             const components::Visual *,
@@ -544,6 +546,7 @@ void RenderUtilPrivate::CreateRenderingEntities(
             const components::Pose *_pose,
             const components::Geometry *_geom,
             const components::CastShadows *_castShadows,
+            const components::Transparency *_transparency,
             const components::ParentEntity *_parent)->bool
         {
           sdf::Visual visual;
@@ -551,6 +554,7 @@ void RenderUtilPrivate::CreateRenderingEntities(
           visual.SetRawPose(_pose->Data());
           visual.SetGeom(_geom->Data());
           visual.SetCastShadows(_castShadows->Data());
+          visual.SetTransparency(_transparency->Data());
 
           // Optional components
           auto material = _ecm.Component<components::Material>(_entity);
@@ -707,6 +711,7 @@ void RenderUtilPrivate::CreateRenderingEntities(
     _ecm.EachNew<components::Visual, components::Name, components::Pose,
               components::Geometry,
               components::CastShadows,
+              components::Transparency,
               components::ParentEntity>(
         [&](const Entity &_entity,
             const components::Visual *,
@@ -714,6 +719,7 @@ void RenderUtilPrivate::CreateRenderingEntities(
             const components::Pose *_pose,
             const components::Geometry *_geom,
             const components::CastShadows *_castShadows,
+            const components::Transparency *_transparency,
             const components::ParentEntity *_parent)->bool
         {
           sdf::Visual visual;
@@ -721,6 +727,7 @@ void RenderUtilPrivate::CreateRenderingEntities(
           visual.SetRawPose(_pose->Data());
           visual.SetGeom(_geom->Data());
           visual.SetCastShadows(_castShadows->Data());
+          visual.SetTransparency(_transparency->Data());
 
           // Optional components
           auto material = _ecm.Component<components::Material>(_entity);
@@ -1025,6 +1032,8 @@ void RenderUtil::Init()
     this->dataPtr->scene->SetBackgroundColor(this->dataPtr->backgroundColor);
   }
   this->dataPtr->sceneManager.SetScene(this->dataPtr->scene);
+  if (this->dataPtr->enableSensors)
+    this->dataPtr->markerManager.SetTopic("/sensors/marker");
   this->dataPtr->markerManager.Init(this->dataPtr->scene);
 }
 
@@ -1119,13 +1128,8 @@ SceneManager &RenderUtil::SceneManager()
 /////////////////////////////////////////////////
 Entity RenderUtil::EntityFromNode(const rendering::NodePtr &_node)
 {
-  Entity entity = kNullEntity;
-  auto vis = std::dynamic_pointer_cast<rendering::Visual>(_node);
-
-  if (vis)
-    entity = std::get<int>(vis->UserData("gazebo-entity"));
-
-  return entity;
+  // \todo(anyone) Use UserData once rendering Node supports that
+  return this->dataPtr->sceneManager.EntityFromNode(_node);
 }
 
 /////////////////////////////////////////////////
@@ -1141,11 +1145,8 @@ void RenderUtil::SetSelectedEntity(rendering::NodePtr _node)
   if (!_node)
     return;
 
-  auto vis = std::dynamic_pointer_cast<rendering::Visual>(_node);
-  Entity entityId = kNullEntity;
-
-  if (vis)
-    entityId = std::get<int>(vis->UserData("gazebo-entity"));
+  // \todo(anyone) Use UserData once rendering Node supports it
+  auto entityId = this->dataPtr->sceneManager.EntityFromNode(_node);
 
   if (entityId == kNullEntity)
     return;
