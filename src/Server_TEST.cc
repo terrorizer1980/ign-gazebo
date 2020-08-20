@@ -199,8 +199,15 @@ TEST_P(ServerFixture, ServerConfigRealPlugin)
   // make sure the TestModelSystem was successfully loaded.
   transport::Node node;
   msgs::StringMsg rep;
-  bool result;
-  bool executed = node.Request("/test/service", 5000, rep, result);
+  bool result{false};
+  bool executed{false};
+  int sleep{0};
+  int maxSleep{30};
+  while (!executed && sleep < maxSleep)
+  {
+    executed = node.Request("/test/service", 100, rep, result);
+    sleep++;
+  }
   EXPECT_TRUE(executed);
   EXPECT_TRUE(result);
   EXPECT_EQ("TestModelSystem", rep.data());
@@ -238,8 +245,15 @@ TEST_P(ServerFixture, ServerConfigSensorPlugin)
   // make sure the TestSensorSystem was successfully loaded.
   transport::Node node;
   msgs::StringMsg rep;
-  bool result;
-  bool executed = node.Request("/test/service/sensor", 5000, rep, result);
+  bool result{false};
+  bool executed{false};
+  int sleep{0};
+  int maxSleep{30};
+  while (!executed && sleep < maxSleep)
+  {
+    executed = node.Request("/test/service/sensor", 100, rep, result);
+    sleep++;
+  }
   EXPECT_TRUE(executed);
   EXPECT_TRUE(result);
   EXPECT_EQ("TestSensorSystem", rep.data());
@@ -761,8 +775,15 @@ TEST_P(ServerFixture, GetResourcePaths)
 
   transport::Node node;
   msgs::StringMsg_V res;
-  bool result;
-  bool executed = node.Request("/gazebo/resource_paths/get", 5000, res, result);
+  bool result{false};
+  bool executed{false};
+  int sleep{0};
+  int maxSleep{30};
+  while (!executed && sleep < maxSleep)
+  {
+    executed = node.Request("/gazebo/resource_paths/get", 100, res, result);
+    sleep++;
+  }
   EXPECT_TRUE(executed);
   EXPECT_TRUE(result);
   EXPECT_EQ(2, res.data_size());
